@@ -25,7 +25,7 @@
     // combined `pdf.worker.js` file.
     PDFJS.workerSrc = '../src/worker_loader.js';
   </script>
-	<script src="hello.js"></script>
+	<!--<script src="hello.js"></script>-->
 </head>
 <body>
 
@@ -40,19 +40,7 @@
 	<div class="container">
 		<div id="zoom-viewport">
 			<div class="flipbook">
-			<div style="background-image:url(pages/1.jpg)"></div>
-			<div style="background-image:url(pages/2.jpg)"></div>
-			<div style="background-image:url(pages/3.jpg)"></div>
-			<div style="background-image:url(pages/4.jpg)"></div>
-			<div style="background-image:url(pages/5.jpg)"></div>
-			<div style="background-image:url(pages/6.jpg)"></div>
-			<div style="background-image:url(pages/7.jpg)"></div>
-			<div style="background-image:url(pages/8.jpg)"></div>
-			<div style="background-image:url(pages/9.jpg)"></div>
-			<div style="background-image:url(pages/10.jpg)"></div>
-			<div style="background-image:url(pages/11.jpg)"></div>
-			<div style="background-image:url(pages/12.jpg)"></div>
-		</div>
+		    </div>
 		</div>
 	</div>
 </div>
@@ -61,31 +49,80 @@
 <script type="text/javascript">
 
 function loadApp() {
+    console.log("app loaded");
 
+    PDFJS.getDocument('2633-withcover.pdf').then(function(pdf) {
+      console.log("pdf loaded");
+      var loadedPages = 0;
+
+      for(var pageNum = 1; pageNum <= pdf.numPages; pageNum++){
+          // Using promise to fetch the page
+          pdf.getPage(pageNum).then(function(page) {
+            var scale = 0.7;
+            var viewport = page.getViewport(scale);
+
+            //
+            // Prepare canvas using PDF page dimensions
+            //
+            var canvas = document.createElement("canvas");
+            //var canvas = document.getElementById('the-canvas');
+            var context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            //
+            // Render PDF page into canvas context
+            //
+            var renderContext = {
+              canvasContext: context,
+              viewport: viewport
+            };
+            page.render(renderContext);
+            var div = document.createElement("DIV");
+            $(div).append(canvas);
+            $("div.flipbook").append(div);
+
+            if (++loadedPages >= pdf.numPages) {
+                console.log("all pages loaded")
+              $('.flipbook').turn({ width:922, height:600, elevation: 50, gradients: true, autoCenter: true });
+            }
+          });
+      }
+
+
+    });
+
+    $("#zoom-viewport").bind("zoom.doubleTap", function(event) {
+      if ($(this).zoom("value")==1) {
+        $(this).zoom("zoomIn", event);
+      } else {
+        $(this).zoom("zoomOut");
+      }
+    });
 	// Create the flipbook
 
-	$('.flipbook').turn({
-			// Width
+	// $('.flipbook').turn({
+	// 		// Width
 
-			width:922,
-			
-			// Height
+	// 		width:922,
 
-			height:600,
+	// 		// Height
 
-			// Elevation
+	// 		height:600,
 
-			elevation: 50,
-			
-			// Enable gradients
+	// 		// Elevation
 
-			gradients: true,
-			
-			// Auto center this flipbook
+	// 		elevation: 50,
 
-			autoCenter: true
+	// 		// Enable gradients
 
-	});
+	// 		gradients: true,
+
+	// 		// Auto center this flipbook
+
+	// 		autoCenter: true
+
+	// });
 }
 
 // Load the HTML4 version if there's not CSS transform

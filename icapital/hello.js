@@ -11,9 +11,10 @@
 // Fetch the PDF document from the URL using promises
 //
 PDFJS.getDocument('2633-withcover.pdf').then(function(pdf) {
-  var pageNum = 1;
+  console.log("pdf loaded");
+  var loadedPages = 0;
 
-  //for(pageNum; pageNum<= pdf.numPages; pageNum++){
+  for(var pageNum = 1; pageNum <= pdf.numPages; pageNum++){
       // Using promise to fetch the page
       pdf.getPage(pageNum).then(function(page) {
         var scale = 0.7;
@@ -37,13 +38,16 @@ PDFJS.getDocument('2633-withcover.pdf').then(function(pdf) {
         };
         page.render(renderContext);
         var div = document.createElement("DIV");
-        //var div = $(<div></div>);
         $(div).append(canvas);
         $("div.flipbook").append(div);
-      });
-  //}
 
-  
+        if (++loadedPages >= pdf.numPages) {
+          // $('.flipbook').turn({ width:922, height:600, elevation: 50, gradients: true, autoCenter: true });
+        }
+      });
+  }
+
+
 });
 
 $("#zoom-viewport").bind("zoom.doubleTap", function(event) {
