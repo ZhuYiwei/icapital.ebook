@@ -3,20 +3,19 @@
 <!--[if IE 7 ]>    <html lang="en" class="ie7"> <![endif]-->
 <!--[if IE 8 ]>    <html lang="en" class="ie8"> <![endif]-->
 <!--[if IE 9 ]>    <html lang="en" class="ie9"> <![endif]-->
-<!--[if !IE]><!--> <html lang="en"> <!--<![endif]-->
+<!--[if !IE]><!--> 
+<html lang="en">
 <head>
+  <title>Vol 26 No 33</title>
 	<meta name="viewport" content="width = 1050, user-scalable = no" />
+
+  <!-- import turn.js -->
 	<script src="../turnjs4/extras/jquery.min.1.7.js"></script>
 	<script src="../turnjs4/extras/modernizr.2.5.3.min.js"></script>
-
-<script src="../src/shared/util.js"></script>
-  <script src="../src/display/api.js"></script>
-  <script src="../src/display/metadata.js"></script>
-  <script src="../src/display/canvas.js"></script>
-  <script src="../src/display/webgl.js"></script>
-  <script src="../src/display/pattern_helper.js"></script>
-  <script src="../src/display/font_loader.js"></script>
-  <script src="../src/display/annotation_helper.js"></script>
+  <script src="../turnjs4/extras/jquery-ui-1.8.20.custom.min.js"></script>
+  <script src="../turnjs4/lib/hash.js"></script>
+  
+  <!-- import pdf.js -->
   <script src="../build/pdf.js"></script>
 
   <script>
@@ -25,22 +24,21 @@
     // combined `pdf.worker.js` file.
     PDFJS.workerSrc = '../src/worker_loader.js';
   </script>
-	<!--<script src="hello.js"></script>-->
+	<!--import own js file <script src="hello.js"></script>-->
 </head>
 <body>
 
-<div>
+<!-- <div>
   <button id="prev">Previous</button>
   <button id="next">Next</button>
   &nbsp; &nbsp;
   <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
-</div>
+</div> -->
 
 <div class="flipbook-viewport">
-	<div class="container">
-		<div id="zoom-viewport">
-			<div class="flipbook">
-		    </div>
+	<div id="zoom-viewport">
+		<div class="container">
+			<div class="flipbook"></div>
 		</div>
 	</div>
 </div>
