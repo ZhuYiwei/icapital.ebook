@@ -1,0 +1,133 @@
+<!doctype html>
+<!--[if lt IE 7 ]> <html lang="en" class="ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html lang="en" class="ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="en" class="ie8"> <![endif]-->
+<!--[if IE 9 ]>    <html lang="en" class="ie9"> <![endif]-->
+<!--[if !IE]><!--> 
+<html lang="en">
+<head>
+  <title>Vol 26 No 33</title>
+	<meta name="viewport" content="width = 1050, user-scalable = no" />
+
+  <!-- import turn.js -->
+	<script src="../../turnjs4/extras/jquery.min.1.7.js"></script>
+	<script src="../../turnjs4/extras/modernizr.2.5.3.min.js"></script>
+  <script src="../../turnjs4/extras/jquery-ui-1.8.20.custom.min.js"></script>
+  <script src="../../turnjs4/lib/hash.js"></script>
+  
+  <!-- import pdf.js -->
+  <script src="../../build/pdf.js"></script>
+
+  <script>
+    // Specify the main script used to create a new PDF.JS web worker.
+    // In production, leave this undefined or change it to point to the
+    // combined `pdf.worker.js` file.
+    PDFJS.workerSrc = '../../src/worker_loader.js';
+  </script>
+	<!--import own js file <script src="hello.js"></script>-->
+</head>
+<body>
+
+<!-- <div>
+  <button id="prev">Previous</button>
+  <button id="next">Next</button>
+  &nbsp; &nbsp;
+  <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
+</div> -->
+
+<div class="flipbook-viewport">
+	<div id="zoom-viewport">
+		<div class="container">
+			<div class="flipbook"></div>
+		</div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+
+function loadApp() {
+    console.log("app loaded");
+
+    PDFJS.getDocument('2633-withcover.pdf').then(function(pdf) {
+      console.log("pdf loaded");
+      var loadedPages = 0;
+
+      for(var pageNum = 1; pageNum <= pdf.numPages; pageNum++){
+          // Using promise to fetch the page
+          pdf.getPage(pageNum).then(function(page) {
+            var scale = 0.7;
+            var viewport = page.getViewport(scale);
+
+            //
+            // Prepare canvas using PDF page dimensions
+            //
+            var canvas = document.createElement("canvas");
+            //var canvas = document.getElementById('the-canvas');
+            var context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            //
+            // Render PDF page into canvas context
+            //
+            var renderContext = {
+              canvasContext: context,
+              viewport: viewport
+            };
+            page.render(renderContext);
+            var div = document.createElement("DIV");
+            $(div).append(canvas);
+            $("div.flipbook").append(div);
+
+            if (++loadedPages >= pdf.numPages) {
+                console.log("all pages loaded")
+              $('.flipbook').turn({ width:922, height:600, elevation: 50, gradients: true, autoCenter: true });
+            }
+          });
+      }
+
+
+    });
+
+
+	// Create the flipbook
+
+	// $('.flipbook').turn({
+	// 		// Width
+
+	// 		width:922,
+
+	// 		// Height
+
+	// 		height:600,
+
+	// 		// Elevation
+
+	// 		elevation: 50,
+
+	// 		// Enable gradients
+
+	// 		gradients: true,
+
+	// 		// Auto center this flipbook
+
+	// 		autoCenter: true
+
+	// });
+}
+
+// Load the HTML4 version if there's not CSS transform
+
+yepnope({
+	test : Modernizr.csstransforms,
+	yep: ['../../turnjs4/lib/turn.js'],
+	nope: ['../../turnjs4/lib/turn.html4.min.js'],
+	both: ['css/basic.css'],
+	complete: loadApp
+});
+
+</script>
+
+</body>
+</html>

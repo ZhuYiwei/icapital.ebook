@@ -33,7 +33,7 @@ function loadPage(page, pageElement) {
 		e.preventDefault();
 	});
 
-	canvas.load(function() {
+	img.load(function() {
 		
 		// Set the size
 		$(this).css({width: '100%', height: '100%'});

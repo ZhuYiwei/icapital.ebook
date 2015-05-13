@@ -1,23 +1,16 @@
 <!doctype html>
-<html lang="en">
+<!--[if lt IE 7 ]> <html lang="en" class="ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html lang="en" class="ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="en" class="ie8"> <![endif]-->
+<!--[if IE 9 ]>    <html lang="en" class="ie9"> <![endif]-->
+<!--[if !IE]><!--> <html lang="en"> <!--<![endif]-->
 <head>
-	<title>Using turn.js and the new zoom feature</title>
-	<meta name="viewport" content="width = 1050, user-scalable = no" />
-	<link rel="icon" type="image/png" href="../../pics/favicon.png" />
-	<script src="../../extras/jquery.min.1.7.js"></script>
-	<script src="../../extras/jquery-ui-1.8.20.custom.min.js"></script>
-	<script src="../../extras/modernizr.2.5.3.min.js"></script>
-	<script src="../../lib/hash.js"></script>
+<title>Using turn.js and the new zoom feature</title>
+<meta name="viewport" content="width = 1050, user-scalable = no" />
+<script type="text/javascript" src="../../extras/jquery.min.1.7.js"></script>
+<script type="text/javascript" src="../../extras/modernizr.2.5.3.min.js"></script>
+<script type="text/javascript" src="../../lib/hash.js"></script>
 
-	<!-- import pdf.js -->
-	<script src="../build/pdf.js"></script>
-
-  <script>
-    // Specify the main script used to create a new PDF.JS web worker.
-    // In production, leave this undefined or change it to point to the
-    // combined `pdf.worker.js` file.
-    PDFJS.workerSrc = '../src/worker_loader.js';
-  </script>
 </head>
 <body>
 
@@ -34,11 +27,48 @@
 			<div ignore="1" class="previous-button"></div>
 		</div>
 	</div>
-	<div class="bottom">
-		<div id="slider-bar" class="turnjs-slider">
-			<div id="slider"></div>
-		</div>
-	</div>
+</div>
+
+<!-- Thumbnails -->
+<div class="thumbnails">
+	<div>
+		<ul>
+			<li class="i">
+				<img src="pages/1-thumb.jpg" width="76" height="100" class="page-1">
+				<span>1</span>
+			</li>
+			<li class="d">
+				<img src="pages/2-thumb.jpg" width="76" height="100" class="page-2">
+				<img src="pages/3-thumb.jpg" width="76" height="100" class="page-3">
+				<span>2-3</span>
+			</li>
+			<li class="d">
+				<img src="pages/4-thumb.jpg" width="76" height="100" class="page-4">
+				<img src="pages/5-thumb.jpg" width="76" height="100" class="page-5">
+				<span>4-5</span>
+			</li>
+			<li class="d">
+				<img src="pages/6-thumb.jpg" width="76" height="100" class="page-6">
+				<img src="pages/7-thumb.jpg" width="76" height="100" class="page-7">
+				<span>6-7</span>
+			</li>
+			<li class="d">
+				<img src="pages/8-thumb.jpg" width="76" height="100" class="page-8">
+				<img src="pages/9-thumb.jpg" width="76" height="100" class="page-9">
+				<span>8-9</span>
+			</li>
+			<li class="d">
+				<img src="pages/10-thumb.jpg" width="76" height="100" class="page-10">
+				<img src="pages/11-thumb.jpg" width="76" height="100" class="page-11">
+				<span>10-11</span>
+			</li>
+			<li class="i">
+				<img src="pages/12-thumb.jpg" width="76" height="100" class="page-12">
+				<span>12</span>
+			</li>
+		<ul>
+	<div>	
+</div>
 </div>
 
 <script type="text/javascript">
@@ -56,7 +86,6 @@ function loadApp() {
 		return;
 	}
 	
-
 	// Create the flipbook
 
 	flipbook.turn({
@@ -72,6 +101,10 @@ function loadApp() {
 			// Duration in millisecond
 
 			duration: 1000,
+
+			// Hardware acceleration
+
+			acceleration: !isChrome(),
 
 			// Enables gradients
 
@@ -105,6 +138,17 @@ function loadApp() {
 					// Show and hide navigation buttons
 
 					disableControls(page);
+					
+
+					$('.thumbnails .page-'+currentPage).
+						parent().
+						removeClass('current');
+
+					$('.thumbnails .page-'+page).
+						parent().
+						addClass('current');
+
+
 
 				},
 
@@ -114,21 +158,18 @@ function loadApp() {
 
 					$(this).turn('center');
 
-					$('#slider').slider('value', getViewNumber($(this), page));
-
 					if (page==1) { 
 						$(this).turn('peel', 'br');
 					}
 
 				},
-//             This event is triggered when some pages are required in the
-//             current range.
+
 				missing: function (event, pages) {
 
 					// Add pages that aren't in the magazine
 
 					for (var i = 0; i < pages.length; i++)
-						addPage(pages[i], $(this)); //magazine.js
+						addPage(pages[i], $(this));
 
 				}
 			}
@@ -147,6 +188,7 @@ function loadApp() {
 		}, 
 
 		when: {
+
 			swipeLeft: function() {
 
 				$(this).zoom('flipbook').turn('next');
@@ -170,7 +212,7 @@ function loadApp() {
 
 			zoomIn: function () {
 
-				$('#slider-bar').hide();
+				$('.thumbnails').hide();
 				$('.made').hide();
 				$('.magazine').removeClass('animated').addClass('zoom-in');
 				$('.zoom-icon').removeClass('zoom-icon-in').addClass('zoom-icon-out');
@@ -190,8 +232,8 @@ function loadApp() {
 
 			zoomOut: function () {
 
-				$('#slider-bar').fadeIn();
 				$('.exit-message').hide();
+				$('.thumbnails').fadeIn();
 				$('.made').fadeIn();
 				$('.zoom-icon').removeClass('zoom-icon-out').addClass('zoom-icon-in');
 
@@ -268,6 +310,56 @@ function loadApp() {
 		resizeViewport();
 	});
 
+	// Events for thumbnails
+
+	$('.thumbnails').click(function(event) {
+		
+		var page;
+
+		if (event.target && (page=/page-([0-9]+)/.exec($(event.target).attr('class'))) ) {
+		
+			$('.magazine').turn('page', page[1]);
+		}
+	});
+
+	$('.thumbnails li').
+		bind($.mouseEvents.over, function() {
+			
+			$(this).addClass('thumb-hover');
+
+		}).bind($.mouseEvents.out, function() {
+			
+			$(this).removeClass('thumb-hover');
+
+		});
+
+	if ($.isTouch) {
+	
+		$('.thumbnails').
+			addClass('thumbanils-touch').
+			bind($.mouseEvents.move, function(event) {
+				event.preventDefault();
+			});
+
+	} else {
+
+		$('.thumbnails ul').mouseover(function() {
+
+			$('.thumbnails').addClass('thumbnails-hover');
+
+		}).mousedown(function() {
+
+			return false;
+
+		}).mouseout(function() {
+
+			$('.thumbnails').removeClass('thumbnails-hover');
+
+		});
+
+	}
+
+
 	// Regions
 
 	if ($.isTouch) {
@@ -281,18 +373,23 @@ function loadApp() {
 	$('.next-button').bind($.mouseEvents.over, function() {
 		
 		$(this).addClass('next-button-hover');
+
 	}).bind($.mouseEvents.out, function() {
 		
 		$(this).removeClass('next-button-hover');
+
 	}).bind($.mouseEvents.down, function() {
 		
 		$(this).addClass('next-button-down');
+
 	}).bind($.mouseEvents.up, function() {
 		
 		$(this).removeClass('next-button-down');
+
 	}).click(function() {
 		
 		$('.magazine').turn('next');
+
 	});
 
 	// Events for the next button
@@ -300,55 +397,25 @@ function loadApp() {
 	$('.previous-button').bind($.mouseEvents.over, function() {
 		
 		$(this).addClass('previous-button-hover');
+
 	}).bind($.mouseEvents.out, function() {
 		
 		$(this).removeClass('previous-button-hover');
+
 	}).bind($.mouseEvents.down, function() {
 		
 		$(this).addClass('previous-button-down');
+
 	}).bind($.mouseEvents.up, function() {
 		
 		$(this).removeClass('previous-button-down');
+
 	}).click(function() {
 		
 		$('.magazine').turn('previous');
+
 	});
 
-
-	// Slider
-
-	$( "#slider" ).slider({
-		min: 1,
-		max: numberOfViews(flipbook),
-
-		start: function(event, ui) {
-
-			if (!window._thumbPreview) {
-				_thumbPreview = $('<div />', {'class': 'thumbnail'}).html('<div></div>');
-				setPreview(ui.value);
-				_thumbPreview.appendTo($(ui.handle));
-			} else
-				setPreview(ui.value);
-
-			moveBar(false);
-
-		},
-
-		slide: function(event, ui) {
-
-			setPreview(ui.value);
-
-		},
-
-		stop: function() {
-
-			if (window._thumbPreview)
-				_thumbPreview.removeClass('show');
-			
-			$('.magazine').turn('page', Math.max(1, $(this).slider('value')*2 - 2));
-
-		}
-	});
 
 	resizeViewport();
 
@@ -390,9 +457,9 @@ function loadApp() {
 
 yepnope({
 	test : Modernizr.csstransforms,
-	yep: ['../../lib/turn.min.js'],
-	nope: ['../../lib/turn.html4.min.js', 'css/jquery.ui.html4.css'],
-	both: ['../../lib/zoom.min.js', 'css/jquery.ui.css', 'js/magazine.js', 'css/magazine.css'],
+	yep: ['../../lib/turn.js'],
+	nope: ['../../lib/turn.html4.min.js'],
+	both: ['../../lib/zoom.min.js', 'js/magazine.js', 'css/magazine.css'],
 	complete: loadApp
 });
 

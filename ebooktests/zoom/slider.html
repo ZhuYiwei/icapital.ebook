@@ -1,22 +1,22 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<title>Using turn.js and the new zoom feature</title>
+	<title>zoom & slider</title>
 	<meta name="viewport" content="width = 1050, user-scalable = no" />
 	<link rel="icon" type="image/png" href="../../pics/favicon.png" />
-	<script src="../../extras/jquery.min.1.7.js"></script>
-	<script src="../../extras/jquery-ui-1.8.20.custom.min.js"></script>
-	<script src="../../extras/modernizr.2.5.3.min.js"></script>
-	<script src="../../lib/hash.js"></script>
+	<script src="../../turnjs4/extras/jquery.min.1.7.js"></script>
+	<script src="../../turnjs4/extras/jquery-ui-1.8.20.custom.min.js"></script>
+	<script src="../../turnjs4/extras/modernizr.2.5.3.min.js"></script>
+	<script src="../../turnjs4/lib/hash.js"></script>
 
 	<!-- import pdf.js -->
-	<script src="../build/pdf.js"></script>
+	<script src="../../build/pdf.js"></script>
 
   <script>
     // Specify the main script used to create a new PDF.JS web worker.
     // In production, leave this undefined or change it to point to the
     // combined `pdf.worker.js` file.
-    PDFJS.workerSrc = '../src/worker_loader.js';
+    PDFJS.workerSrc = '../../src/worker_loader.js';
   </script>
 </head>
 <body>
@@ -56,8 +56,41 @@ function loadApp() {
 		return;
 	}
 	
+    PDFJS.getDocument('2633-withcover.pdf').then(function(pdf) {
+      console.log("pdf loaded");
+      var loadedPages = 0;
 
-	// Create the flipbook
+      for(var pageNum = 1; pageNum <= pdf.numPages; pageNum++){
+          // Using promise to fetch the page
+          pdf.getPage(pageNum).then(function(page) {
+            var scale = 0.7;
+            var viewport = page.getViewport(scale);
+
+            //
+            // Prepare canvas using PDF page dimensions
+            //
+            var canvas = document.createElement("canvas");
+            //var canvas = document.getElementById('the-canvas');
+            var context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            //
+            // Render PDF page into canvas context
+            //
+            var renderContext = {
+              canvasContext: context,
+              viewport: viewport
+            };
+            page.render(renderContext);
+            var element = $('<div />', {});
+            element.html('<div class="gradient"></div><div class="loader"></div>');
+            element.append(canvas);
+            flipbook.append(element);
+
+            if (++loadedPages >= pdf.numPages) {
+                console.log("all pages loaded")
+              	// Create the flipbook
 
 	flipbook.turn({
 			
@@ -120,9 +153,10 @@ function loadApp() {
 						$(this).turn('peel', 'br');
 					}
 
-				},
-//             This event is triggered when some pages are required in the
-//             current range.
+				}
+				,
+            // This event is triggered when some pages are required in the
+            // current range.
 				missing: function (event, pages) {
 
 					// Add pages that aren't in the magazine
@@ -134,6 +168,13 @@ function loadApp() {
 			}
 
 	});
+            }
+          });
+      }
+
+
+    });
+
 
 	// Zoom.js
 
@@ -390,9 +431,9 @@ function loadApp() {
 
 yepnope({
 	test : Modernizr.csstransforms,
-	yep: ['../../lib/turn.min.js'],
-	nope: ['../../lib/turn.html4.min.js', 'css/jquery.ui.html4.css'],
-	both: ['../../lib/zoom.min.js', 'css/jquery.ui.css', 'js/magazine.js', 'css/magazine.css'],
+	yep: ['../../turnjs4/lib/turn.min.js'],
+	nope: ['../../turnjs4/lib/turn.html4.min.js', 'css/jquery.ui.html4.css'],
+	both: ['../../turnjs4/lib/zoom.min.js', 'css/jquery.ui.css', 'js/magazine.js', 'css/magazine.css'],
 	complete: loadApp
 });
 
